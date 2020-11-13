@@ -24,7 +24,17 @@ class DiscordDB(object):
         """A property which returns an instance of ``discord.TextChannel`` which is being used as database."""
         return self.__bot.get_channel(self.__channel_id)
 
-    async def set(self, data: dict) -> int:
+    async def set_channel(self, channel_id: int):
+        """A method used to change the channel in which all of your data will be sent
+
+        Parameters:
+        -----------
+        channel_id : int
+            Id of the channel you wish to change to.
+        """
+        self.__channel_id = channel_id
+
+    async def save(self, data: dict) -> int:
         """A method to post and save data to your database channel.
 
         Parameters
@@ -45,6 +55,31 @@ class DiscordDB(object):
         })
         message = await self.channel.send(embed=embed)
         return message.id
+
+    async def saves(self, data: list) -> list:
+        """A method used to post and save multiple data dict to a single channel.
+
+        Parameters
+        ----------
+        data : list
+            List of data dictionaries
+
+        Returns
+        -------
+        list
+            A list of ids
+        """
+        _data_list = []
+        for _data in data:
+            embed = discord.Embed.from_dict({
+                "inline": True,
+                "fields": [{
+                    "name": name, "value": value
+                } for name, value in _data.items()]
+            })
+            message = await self.channel.send(embed=embed)
+            _data_list.append(message.id)
+        return _data_list
 
     async def get(self, _id: int) -> Data:
         """A method used to get your saved data from the database channel.

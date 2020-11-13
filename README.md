@@ -2,12 +2,15 @@
 [![Documentation Status](https://readthedocs.org/projects/discorddb/badge/?version=latest)](https://discorddb.readthedocs.io/en/latest/?badge=latest)
 
 A simple database which uses a Discord channel to store data.
+This is a fork from thec0sm0s's DiscordDB.
+This version aims to be more flexible.
+
+### Features
+* Sending multiple data to multiple channels (or the same channel) at the same time (Just started to program it)
+* More to come
 
 ### Installation
-To install current latest release you can use following command:
-```sh
-python3 -m pip install DiscordDB
-```
+Not currently available
 
 
 ### Basic Example
@@ -17,7 +20,7 @@ from discord.ext import commands
 
 
 LOGS = []
-DATABASE_CHANNEL_ID = 399397622743564297
+DATABASE_CHANNEL_ID = The id of a channel (int)
 
 
 class MyBot(commands.Bot):
@@ -29,7 +32,7 @@ class MyBot(commands.Bot):
     @commands.command()
     async def log(self, ctx, *, text):
         data = {
-            "name": ctx.author,
+            "name": ctx.author.name,
             "text": text
         }
         _id = await self.discordDB.set(data)
@@ -45,6 +48,9 @@ class MyBot(commands.Bot):
 bot = MyBot()
 bot.run("TOKEN")
 ```
+
+If you wish to save the LOGS to be able to recover them after the bot closed,
+you can consider put it in a file using json or some file managment system.
 
 
 ### Requirements
