@@ -6,7 +6,7 @@ sphinx:
 formats: all
 
 build:
-  image: latest
+  image: 0.0.6
 
 python:
   version: 3.7

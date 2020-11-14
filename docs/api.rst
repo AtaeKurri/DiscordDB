@@ -43,6 +43,17 @@ DiscordDB Client
         :return: Data
         :rtype: :class:`dict`
 
+    .. py:method:: getf(message_id, field)
+
+        Get only one data field from the given message.
+
+        :param int message_id: The id of the message to get the data from
+        :type message_id: :class:`int`
+        :param str field: The field name from which the data will be taken.
+        :type field: :class:`str`
+        :return: The field value
+        :rtype: :class:`str`
+
     .. py:method:: edit(data, id)
 
         Edit a given message.
