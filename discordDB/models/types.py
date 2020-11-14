@@ -1,6 +1,8 @@
 class Data(dict):
     """Actually a superset class of python dictionaries, which also supports accessing of its keys using . syntax.
 
+    UNUSED FOR THE MOMENT.
+
     Extra Attributes
     ----------------
 

@@ -6,8 +6,8 @@ This is a fork from thec0sm0s's DiscordDB.
 This version aims to be more flexible.
 
 ### Features
-* Sending multiple data to multiple channels (or the same channel) at the same time (Just started to program it)
-* More to come
+* Sending multiple data packs at the same time (Just started to program it)
+* Edit a data entry from a message id.
 
 ### Installation
 Not currently available

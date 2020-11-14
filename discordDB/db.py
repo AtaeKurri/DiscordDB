@@ -81,7 +81,7 @@ class DiscordDB(object):
             _data_list.append(message.id)
         return _data_list
 
-    async def get(self, _id: int) -> Data:
+    async def get(self, _id: int) -> dict:
         """A method used to get your saved data from the database channel.
 
         Parameters
@@ -91,13 +91,32 @@ class DiscordDB(object):
 
         Returns
         -------
-        Data
-            An instance of :py:class:`discordDB.models.Data`, similar to python dictionaries but also
-            supports accessing of its key using . syntax.
+        dict
+            A dict containing the data recovered from the message.
 
         """
         message = await self.channel.fetch_message(_id)
         _data = message.embeds[0].to_dict()["fields"]
-        data = Data({_["name"]: _["value"] for _ in _data})
-        data.created_at = message.created_at
+        data = {_["name"]: _["value"] for _ in _data}
         return data
+    
+    async def edit(self, _data: dict, _id: int):
+        """A method used to edit a data message.
+        You can use the get method to edit the Data dict then use this method to edit the embed.
+
+        Parameters
+        ----------
+        _data : dict
+            A dict containing the changes you want to make to the original message.
+
+        _id : int
+            The id of the message to edit.
+        """
+        message = await self.channel.fetch_message(_id)
+        embed = discord.Embed.from_dict({
+            "fields": [{
+                "name": name, "value": value
+            } for name, value in _data.items()]
+        })
+        await message.edit(embed=embed)
+        
