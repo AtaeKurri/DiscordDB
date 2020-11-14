@@ -22,7 +22,7 @@ copyright = '2020, AtaeKurri'
 author = 'AtaeKurri'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.6a'
+release = '0.0.6'
 
 
 # -- General configuration ---------------------------------------------------
