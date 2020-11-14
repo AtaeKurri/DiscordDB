@@ -1,5 +1,7 @@
 # DiscordDBPlus
 
+[![Documentation Status](https://readthedocs.org/projects/discorddbplus/badge/?version=latest)](https://discorddbplus.readthedocs.io/en/latest/?badge=latest)
+
 A simple database which uses a Discord channel to store data.
 This is a fork from thec0sm0s's DiscordDB.
 This version aims to be more flexible.
