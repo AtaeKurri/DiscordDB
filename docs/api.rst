@@ -22,6 +22,8 @@ DiscordDB Client
 
         :param dict data: The dict data to save
         :type data: :class:`dict`
+        :return: An int containing the message's in which the data was saved.
+        :rtype: :class:`int`
 
     .. py:method:: saves(data)
 
@@ -29,6 +31,8 @@ DiscordDB Client
 
         :param list data: A `list` of `dict` datas to send messages from
         :type data: :class:`list`
+        :return: A list containing ints of the messages in which the data dicts was saved in.
+        :rtype: :class:`list[int]`
 
     .. py:method:: get(message_id)
 
@@ -36,6 +40,8 @@ DiscordDB Client
 
         :param int message_id: The id of the message to get the data from
         :type message_id: :class:`int`
+        :return: Data
+        :rtype: :class:`dict`
 
     .. py:method:: edit(data, id)
 

@@ -45,15 +45,21 @@ class MyBot(commands.Bot):
     async def show_logs(self, ctx):
         for _id in LOGS:
             data = await self.discordDB.get(_id)
-            await ctx.send(f"Name: {data.name}, Text: {data.text}")
+            await ctx.send(f"Name: {data[name]}, Text: {data[text]}")
 
     @commands.command()
-    async def log(self, ctx, id):
+    async def edit_data(self, ctx, id):
         _id = int(id)
         data = await DB.get(_id)
         data["name"] = "example modification"
         data["text3"] = "Edited text"
         await DB.edit(data, _id)
+
+    @commands.command()
+    async def get_one_field(self, ctx):
+        for _id in LOGS:
+          data = await self.discordDB.getf(_id, "A field")
+          await ctx.send(f"Text: {data}")
 
 
 bot = MyBot()

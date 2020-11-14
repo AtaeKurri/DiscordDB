@@ -87,7 +87,7 @@ class DiscordDB(object):
         Parameters
         ----------
         _id : int
-            An special integer which was received from the :py:meth:`discordDB.DiscordDB.set` method.
+            An special integer which was received from the :py:meth:`discordDBPlus.DiscordDB.set` method.
 
         Returns
         -------
@@ -99,7 +99,28 @@ class DiscordDB(object):
         _data = message.embeds[0].to_dict()["fields"]
         data = {_["name"]: _["value"] for _ in _data}
         return data
-    
+
+    async def getf(self, _id: int, _field:str) -> str:
+        """A method used to get the data of only one field of a given message.
+
+        Parameters
+        ----------
+        _id : int
+            The id of the message your want to get the data from.
+
+        _field : str
+            The field name to get the data from.
+
+        Returns
+        -------
+        str
+            The field's content of the embed.
+        """
+        message = await self.channel.fetch_message(_id)
+        _data = message.embeds[0].to_dict()["fields"]
+        data = {_["name"]: _["value"] for _ in _data}
+        return data[_field]
+
     async def edit(self, _data: dict, _id: int):
         """A method used to edit a data message.
         You can use the get method to edit the Data dict then use this method to edit the embed.
@@ -119,4 +140,3 @@ class DiscordDB(object):
             } for name, value in _data.items()]
         })
         await message.edit(embed=embed)
-        
