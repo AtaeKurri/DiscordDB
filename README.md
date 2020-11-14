@@ -1,5 +1,4 @@
-# DiscordDB
-[![Documentation Status](https://readthedocs.org/projects/discorddb/badge/?version=latest)](https://discorddb.readthedocs.io/en/latest/?badge=latest)
+# DiscordDBPlus
 
 A simple database which uses a Discord channel to store data.
 This is a fork from thec0sm0s's DiscordDB.
@@ -10,12 +9,16 @@ This version aims to be more flexible.
 * Edit a data entry from a message id.
 
 ### Installation
-Not currently available
+
+To install current latest release you can use following command:
+```sh
+python3 -m pip install DiscordDBPlus
+```
 
 
 ### Basic Example
 ```python
-from discordDB import DiscordDB
+from discordDBPlus import DiscordDB
 from discord.ext import commands
 
 
@@ -35,7 +38,7 @@ class MyBot(commands.Bot):
             "name": ctx.author.name,
             "text": text
         }
-        _id = await self.discordDB.set(data)
+        _id = await self.discordDB.save(data)
         LOGS.append(_id)
 
     @commands.command()
@@ -43,6 +46,14 @@ class MyBot(commands.Bot):
         for _id in LOGS:
             data = await self.discordDB.get(_id)
             await ctx.send(f"Name: {data.name}, Text: {data.text}")
+
+    @commands.command()
+    async def log(self, ctx, id):
+        _id = int(id)
+        data = await DB.get(_id)
+        data["name"] = "example modification"
+        data["text3"] = "Edited text"
+        await DB.edit(data, _id)
 
 
 bot = MyBot()
@@ -58,7 +69,4 @@ you can consider put it in a file using json or some file managment system.
 
 
 ### Documentation
-Head over to [documentation] for full API reference. 
-
-
-[documentation]: https://discorddb.readthedocs.io/en/latest/
+Head over to [documentation] for full API reference.

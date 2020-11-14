@@ -2,8 +2,8 @@ from .db import DiscordDB
 
 
 __all__ = [
-    "DiscordDB",
+    "DiscordDBPlus",
 ]
 
 
-__version__ = "0.0.3"
+__version__ = "0.0.5"
