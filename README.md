@@ -5,7 +5,7 @@ This is a fork from thec0sm0s's DiscordDB.
 This version aims to be more flexible.
 
 ### Features
-* Sending multiple data packs at the same time (Just started to program it)
+* Sending multiple data packs at the same time
 * Edit a data entry from a message id.
 
 ### Installation
@@ -70,3 +70,5 @@ you can consider put it in a file using json or some file managment system.
 
 ### Documentation
 Head over to [documentation] for full API reference.
+
+[documentation]: https://discorddbplus.readthedocs.io/en/latest/
