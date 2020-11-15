@@ -63,10 +63,28 @@ DiscordDB Client
         :param int id: The id of the message to update
         :type id: :class:`int`
 
+    .. py:method:: search(id, field)
+
+        Searches a field value in multiple messages and returns all the results.
+
+        :param list id: Ids in which to search the data in
+        :type id: :class:`list`
+        :param str field: A field name
+        :type field: :class:`str`
+        :return: A list of dicts with message id and field value
+        :rtype: :class:`list[dict]` or :class:`None`
+
 
 Data Types
 ----------
 
 .. py:class:: discordDBPlus.models.Data
-..
+
+    Not currently used.
+
+Exceptions
+----------
+
+.. py:class:: discordDBPlus.models.FieldError
+
     Not currently used.

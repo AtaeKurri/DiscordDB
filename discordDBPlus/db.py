@@ -1,6 +1,6 @@
 import discord
 
-from .models import Data
+from .models import Data, FieldError
 
 
 class DiscordDB(object):
@@ -49,6 +49,7 @@ class DiscordDB(object):
 
         """
         embed = discord.Embed.from_dict({
+            "inline?": True,
             "fields": [{
                 "name": name, "value": value
             } for name, value in data.items()]
@@ -72,7 +73,7 @@ class DiscordDB(object):
         _data_list = []
         for _data in data:
             embed = discord.Embed.from_dict({
-                "inline": True,
+                "inline?": True,
                 "fields": [{
                     "name": name, "value": value
                 } for name, value in _data.items()]
@@ -140,3 +141,38 @@ class DiscordDB(object):
             } for name, value in _data.items()]
         })
         await message.edit(embed=embed)
+
+    async def search(self, _ids: list, _field: str) -> list:
+        """A method used to search a value inside one message from a list of messages ids
+        
+        Parameters
+        ----------
+        _ids : list
+            A list containing all the messages to search the data from.
+
+        _field : str
+            The value index you need to search.
+
+        Returns
+        -------
+        list[dict]
+            A list of dicts containing the messages ids the data field was in and the fields contents.
+
+        None
+            The field doesn't exists anywhere in the given messages.
+        """
+        _dictlist = []
+        _found = False
+        for _id in _ids:
+            message = await self.channel.fetch_message(_id)
+            _data = message.embeds[0].to_dict()["fields"]
+            data = {_["name"]: _["value"] for _ in _data}
+            for key, value in data.items():
+                if key == _field:
+                    _dictlist.append({"message_id": message.id, "value": data[key]})
+                    _found = True
+        
+        if _found:
+            return _dictlist
+        elif not _found:
+            return None
