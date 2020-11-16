@@ -10,37 +10,26 @@ class DiscordDB(object):
     ----------
     bot : discord.ext.commands.Bot
         An instance of discord.py Client or Bot representing your discord application.
-    db_channel_id : int
-        An integer representing ID of Discord channel you want to be used as database.
 
     """
 
-    def __init__(self, bot, db_channel_id: int):
+    def __init__(self, bot):
         self.__bot = bot
-        self.__channel_id = db_channel_id
 
-    @property
-    def channel(self):
-        """A property which returns an instance of ``discord.TextChannel`` which is being used as database."""
-        return self.__bot.get_channel(self.__channel_id)
+    def channel(self, _channel_id):
+        """A method which returns an instance of ``discord.TextChannel`` which is being used as database."""
+        return self.__bot.get_channel(_channel_id)
 
-    async def set_channel(self, channel_id: int):
-        """A method used to change the channel in which all of your data will be sent
-
-        Parameters:
-        -----------
-        channel_id : int
-            Id of the channel you wish to change to.
-        """
-        self.__channel_id = channel_id
-
-    async def save(self, data: dict) -> int:
+    async def save(self, data: dict, channel_id: int) -> int:
         """A method to post and save data to your database channel.
 
         Parameters
         ----------
         data : dict
             Dictionary representing your raw data.
+
+        channel_id : int
+            The id of the channel to send the data to.
 
         Returns
         -------
@@ -54,16 +43,19 @@ class DiscordDB(object):
                 "name": name, "value": value
             } for name, value in data.items()]
         })
-        message = await self.channel.send(embed=embed)
+        message = await self.channel(channel_id).send(embed=embed)
         return message.id
 
-    async def saves(self, data: list) -> list:
+    async def saves(self, data: list, channel_id: int) -> list:
         """A method used to post and save multiple data dict to a single channel.
 
         Parameters
         ----------
         data : list
             List of data dictionaries
+
+        channel_id : int
+            The id of the channel to send the data to.
 
         Returns
         -------
@@ -78,17 +70,20 @@ class DiscordDB(object):
                     "name": name, "value": value
                 } for name, value in _data.items()]
             })
-            message = await self.channel.send(embed=embed)
+            message = await self.channel(channel_id).send(embed=embed)
             _data_list.append(message.id)
         return _data_list
 
-    async def get(self, _id: int) -> dict:
+    async def get(self, _id: int, channel_id: int) -> dict:
         """A method used to get your saved data from the database channel.
 
         Parameters
         ----------
         _id : int
-            An special integer which was received from the :py:meth:`discordDBPlus.DiscordDB.set` method.
+            An special integer which was received from the :py:meth:`discordDBPlus.DiscordDB.save` method.
+
+        channel_id : int
+            The id of the channel to get the data from.
 
         Returns
         -------
@@ -96,12 +91,12 @@ class DiscordDB(object):
             A dict containing the data recovered from the message.
 
         """
-        message = await self.channel.fetch_message(_id)
+        message = await self.channel(channel_id).fetch_message(_id)
         _data = message.embeds[0].to_dict()["fields"]
         data = {_["name"]: _["value"] for _ in _data}
         return data
 
-    async def getf(self, _id: int, _field:str) -> str:
+    async def getf(self, _id: int, _field:str, channel_id: int) -> str:
         """A method used to get the data of only one field of a given message.
 
         Parameters
@@ -112,17 +107,20 @@ class DiscordDB(object):
         _field : str
             The field name to get the data from.
 
+        channel_id : int
+            The id of the channel to get the data from.
+
         Returns
         -------
         str
             The field's content of the embed.
         """
-        message = await self.channel.fetch_message(_id)
+        message = await self.channel(channel_id).fetch_message(_id)
         _data = message.embeds[0].to_dict()["fields"]
         data = {_["name"]: _["value"] for _ in _data}
         return data[_field]
 
-    async def edit(self, _data: dict, _id: int):
+    async def edit(self, _data: dict, _id: int, channel_id: int):
         """A method used to edit a data message.
         You can use the get method to edit the Data dict then use this method to edit the embed.
 
@@ -133,8 +131,11 @@ class DiscordDB(object):
 
         _id : int
             The id of the message to edit.
+
+        channel_id : int
+            The id of the channel to edit the data from
         """
-        message = await self.channel.fetch_message(_id)
+        message = await self.channel(channel_id).fetch_message(_id)
         embed = discord.Embed.from_dict({
             "fields": [{
                 "name": name, "value": value
@@ -142,7 +143,7 @@ class DiscordDB(object):
         })
         await message.edit(embed=embed)
 
-    async def search(self, _ids: list, _field: str) -> list:
+    async def search(self, _ids: list, _field: str, channel_ids: list) -> list:
         """A method used to search a value inside one message from a list of messages ids
         
         Parameters
@@ -153,24 +154,31 @@ class DiscordDB(object):
         _field : str
             The value index you need to search.
 
+        channel_ids : list[int]
+            A list of id of the channel to search datas from
+
         Returns
         -------
         list[dict]
-            A list of dicts containing the messages ids the data field was in and the fields contents.
+            A list of dicts containing the messages ids the data field was in, the channels ids and the fields contents.
 
         None
             The field doesn't exists anywhere in the given messages.
         """
         _dictlist = []
         _found = False
-        for _id in _ids:
-            message = await self.channel.fetch_message(_id)
-            _data = message.embeds[0].to_dict()["fields"]
-            data = {_["name"]: _["value"] for _ in _data}
-            for key, value in data.items():
-                if key == _field:
-                    _dictlist.append({"message_id": message.id, "value": data[key]})
-                    _found = True
+        for channel_id in channel_ids:
+            for _id in _ids:
+                try:
+                    message = await self.channel(channel_id).fetch_message(_id)
+                    _data = message.embeds[0].to_dict()["fields"]
+                    data = {_["name"]: _["value"] for _ in _data}
+                    for key, value in data.items():
+                        if key == _field:
+                            _dictlist.append({"channel_id": channel_id, "message_id": message.id, "value": data[key]})
+                            _found = True
+                except:
+                    pass
         
         if _found:
             return _dictlist
