@@ -46,16 +46,13 @@ class DiscordDB(object):
         message = await self.channel(channel_id).send(embed=embed)
         return message.id
 
-    async def saves(self, data: list, channel_id: int) -> list:
+    async def saves(self, data: list) -> list:
         """A method used to post and save multiple data dict to a single channel.
 
         Parameters
         ----------
-        data : list
+        data : list[dict]
             List of data dictionaries
-
-        channel_id : int
-            The id of the channel to send the data to.
 
         Returns
         -------
@@ -64,17 +61,18 @@ class DiscordDB(object):
         """
         _data_list = []
         for _data in data:
+            _channel_id = _data["channel_id"]
             embed = discord.Embed.from_dict({
                 "inline?": True,
                 "fields": [{
                     "name": name, "value": value
-                } for name, value in _data.items()]
+                } for name, value in _data["data"].items()]
             })
-            message = await self.channel(channel_id).send(embed=embed)
+            message = await self.channel(_channel_id).send(embed=embed)
             _data_list.append(message.id)
         return _data_list
 
-    async def get(self, _id: int, channel_id: int) -> dict:
+    async def get(self, _id: int, channel_id: int) -> Data:
         """A method used to get your saved data from the database channel.
 
         Parameters
@@ -87,16 +85,18 @@ class DiscordDB(object):
 
         Returns
         -------
-        dict
+        Data
+            A instance of :class:`discordDBPlus.models.Data`. Supports . syntax
             A dict containing the data recovered from the message.
 
         """
         message = await self.channel(channel_id).fetch_message(_id)
         _data = message.embeds[0].to_dict()["fields"]
-        data = {_["name"]: _["value"] for _ in _data}
+        data = Data({_["name"]: _["value"] for _ in _data})
+        data.created_at = message.created_at
         return data
 
-    async def getf(self, _id: int, _field:str, channel_id: int) -> str:
+    async def getf(self, _id: int, _field:str, channel_id: int) -> Data:
         """A method used to get the data of only one field of a given message.
 
         Parameters
@@ -112,13 +112,18 @@ class DiscordDB(object):
 
         Returns
         -------
-        str
-            The field's content of the embed.
+        Data
+            Data object containing the message date of creating, the field name and the field content.
         """
         message = await self.channel(channel_id).fetch_message(_id)
-        _data = message.embeds[0].to_dict()["fields"]
-        data = {_["name"]: _["value"] for _ in _data}
-        return data[_field]
+        _data_msg = message.embeds[0].to_dict()["fields"]
+        _data = {_["name"]: _["value"] for _ in _data_msg}
+        if _field in _data:
+            data = Data({"field": _field, "content": _data[_field]})
+            data.created_at = message.created_at
+            return data
+        else:
+            raise FieldError("The specified field doesn't exists in the data message")
 
     async def edit(self, _data: dict, _id: int, channel_id: int):
         """A method used to edit a data message.
@@ -159,8 +164,9 @@ class DiscordDB(object):
 
         Returns
         -------
-        list[dict]
-            A list of dicts containing the messages ids the data field was in, the channels ids and the fields contents.
+        list[Data]
+            A list of :class:`discordDBPlus.modelsData` containing the messages ids the data field was in,
+            the channels ids and the fields contents.
 
         None
             The field doesn't exists anywhere in the given messages.
@@ -175,7 +181,9 @@ class DiscordDB(object):
                     data = {_["name"]: _["value"] for _ in _data}
                     for key, value in data.items():
                         if key == _field:
-                            _dictlist.append({"channel_id": channel_id, "message_id": message.id, "value": data[key]})
+                            d = Data({"channel_id": channel_id, "message_id": message.id, "value": data[key]})
+                            d.created_at = message.created_at
+                            _dictlist.append(d)
                             _found = True
                 except:
                     pass
